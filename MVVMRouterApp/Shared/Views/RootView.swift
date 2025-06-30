@@ -10,16 +10,19 @@ import SwiftUI
 // This view acts as a switch, showing the correct root screen based on auth state.
 struct RootView: View {
     @EnvironmentObject var authManager: AuthManager
-    @EnvironmentObject var router: Router
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
-        // If the user is authenticated, show the Dashboard as the root.
-        // Otherwise, show the Login screen.
         if authManager.isAuthenticated {
-            // We create the ViewModel here, passing the dependency.
-            DashboardView(viewModel: DashboardViewModel(authManager: authManager))
+            DashboardView(viewModel: DashboardViewModel(coordinator: coordinator, authManager: authManager))
         } else {
-            LoginView(viewModel: LoginViewModel(router: router, authManager: authManager))
+            LoginView(viewModel: LoginViewModel(coordinator: coordinator, authManager: authManager))
         }
     }
+}
+
+#Preview {
+    RootView()
+        .environmentObject(AuthManager())
+        .environmentObject(NavigationCoordinator())
 }

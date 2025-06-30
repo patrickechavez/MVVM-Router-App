@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+enum NavigationDestination: Codable, Hashable {
+    case register
+    case profile(username: String)
+    case settings(theme: String)
+}

@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+enum ModalDestination: Identifiable, Hashable {
+    case settings(theme: String)
+    
+    var id: Self { self }
+}

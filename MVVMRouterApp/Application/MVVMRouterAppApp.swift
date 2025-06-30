@@ -6,30 +6,54 @@
 //
 
 import SwiftUI
-import Security
 
 // MARK: - App Entry Point
 
 @main
 struct MVVMRouterApp: App {
-    // The AuthManager is the source of truth for authentication state.
     @StateObject var authManager = AuthManager()
-    // The router handles in-flow navigation (e.g., Login -> Register).
-    @StateObject var router = Router()
+    // The NavigationCoordinator now holds the navigation state.
+    @StateObject var coordinator = NavigationCoordinator()
 
     var body: some Scene {
         WindowGroup {
-            // The NavigationStack is the root of our navigation hierarchy.
-            NavigationStack(path: $router.path) {
-                // RootView decides which view to show based on auth state.
+            // The NavigationStack is bound directly to the coordinator's path.
+            NavigationStack(path: $coordinator.path) {
+//                // The RootView determines the first screen.
                 RootView()
-                    .navigationDestination(for: Route.self) { route in
-                        // The view a given route should navigate to.
-                        route.view(router: router, authManager: authManager)
+//                    // The navigationDestination modifier is centralized here.
+//                    // It maps each NavigationDestination case to a specific View.
+                    .navigationDestination(for: NavigationDestination.self) { destination in
+                        switch destination {
+                        case .register:
+                            RegisterView(viewModel: RegisterViewModel(coordinator: coordinator, authManager: authManager))
+                        case .profile(let username):
+                            ProfileView(viewModel: ProfileViewModel(coordinator: coordinator, authManager: authManager, username: username))
+                        case .settings(let theme):
+                            SettingsView(viewModel: SettingsViewModel(coordinator: coordinator, authManager: authManager, activeTheme: theme))
+                        }
                     }
             }
-            // The router and authManager are passed as environment objects.
-            .environmentObject(router)
+            .sheet(item: $coordinator.presentedSheet) { destination in
+                // Map the modal destination to a view
+                switch destination {
+                case .settings(let theme):
+                    // ADD THIS WRAPPER 💡
+                    NavigationStack {
+                        SettingsView(viewModel: SettingsViewModel(coordinator: coordinator, authManager: authManager, activeTheme: theme))
+                    }
+                }
+            }
+            .fullScreenCover(item: $coordinator.presentedFullScreen) { destination in
+                switch destination {
+                case .settings(let theme):
+                    // ADD THIS WRAPPER 💡
+                    NavigationStack {
+                        SettingsView(viewModel: SettingsViewModel(coordinator: coordinator, authManager: authManager, activeTheme: theme))
+                    }
+                }
+            }
+            .environmentObject(coordinator)
             .environmentObject(authManager)
         }
     }

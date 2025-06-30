@@ -1,5 +1,5 @@
 //
-//  RegisterViewModel.swift
+//  LoginViewModel.swift
 //  MVVMRouterApp
 //
 //  Created by John Patrick Echavez on 6/28/25.
@@ -7,10 +7,9 @@
 
 import Foundation
 
-class RegisterViewModel: ObservableObject {
+class LoginViewModel: ObservableObject {
     @Published var username = ""
     @Published var password = ""
-    @Published var confirmPassword = ""
     @Published var hasError = false
     @Published var errorMessage = ""
 
@@ -22,22 +21,15 @@ class RegisterViewModel: ObservableObject {
         self.authManager = authManager
     }
 
-    func register() {
-        if password != confirmPassword {
-            errorMessage = "Passwords do not match."
-            hasError = true
-            return
-        }
+    func login() {
         if username.isEmpty || password.isEmpty {
-            errorMessage = "Fields cannot be empty."
-            hasError = true
-            return
+            errorMessage = "Username and password cannot be empty."; hasError = true
+        } else {
+            authManager.login(username: username, token: username)
         }
-        // After successful registration, log the user in.
-        authManager.login(username: username, token: username)
     }
     
-    func goToLogin() {
-        coordinator.pop()
+    func goToRegister() {
+        coordinator.push(.register)
     }
 }
