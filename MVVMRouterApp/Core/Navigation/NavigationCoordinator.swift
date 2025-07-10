@@ -20,7 +20,9 @@ class NavigationCoordinator: ObservableObject {
     }
 
     func pop() {
-        path.removeLast()
+        if path.count > 0 {
+            path.removeLast()
+        }
     }
 
     func popToRoot() {

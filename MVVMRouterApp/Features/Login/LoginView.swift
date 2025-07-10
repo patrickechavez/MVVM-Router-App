@@ -13,10 +13,25 @@ struct LoginView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("Login").font(.largeTitle).fontWeight(.bold)
-            TextField("Username", text: $viewModel.username)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
+            ZStack(alignment: .trailing) {
+                       // TextField
+                TextField("Select a Country", text: $viewModel.username)
+                           .disabled(true)  // Make it non-editable
+                           .frame(width: 300, alignment: .leading) // Align text to the left
+                           .padding()
+                           .background(Color(.secondarySystemBackground))
+                           .clipShape(RoundedRectangle(cornerRadius: 10))
+                           .onTapGesture {
+                               viewModel.username = "Hello World"
+                           }
+
+                       // Chevron Down Icon above TextField
+                       Image(systemName: "chevron.down")
+                           .foregroundColor(.gray)
+                           .padding(.trailing)
+                   }
+                  
+                
             SecureField("Password", text: $viewModel.password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             Button("Login") {

@@ -32,11 +32,11 @@ struct DashboardView: View {
 }
 
 #Preview {
-    DashboardView(
-        viewModel: DashboardViewModel(
-            coordinator: NavigationCoordinator(),
-            authManager: AuthManager(),
-        )
+    DashboardView(viewModel: DashboardViewModel(
+        coordinator: NavigationCoordinator(),
+        authManager: AuthManager(),
+        userRepository: UserRepository(),
+        productRepository: ProductRepository())
     )
     
 }
