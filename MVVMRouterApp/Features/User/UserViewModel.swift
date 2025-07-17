@@ -10,15 +10,29 @@ import Foundation
 @MainActor
 class UserViewModel: ObservableObject {
     @Published var users: [User] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String?
     
-    // Dependency is now injected
     private let repository: UserRepositoryProtocol
+    init(repository: UserRepositoryProtocol = UserRepository()) { self.repository = repository }
 
-    init(repository: UserRepositoryProtocol) {
-        self.repository = repository
+    func fetchAllUsers() async {
+        await fetch(filter: nil)
     }
-
-    func fetchUsers() async {
-        users = (try? await repository.getUsers()) ?? []
+    
+    func searchUser(username: String) async {
+        let filter = username.isEmpty ? nil : UserFilter(username: username)
+        await fetch(filter: filter)
+    }
+    
+    private func fetch(filter: UserFilter?) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            users = try await repository.fetchUsers(filter: filter)
+        } catch {
+            errorMessage = "Failed to fetch users: \(error.localizedDescription)"
+        }
+        isLoading = false
     }
 }

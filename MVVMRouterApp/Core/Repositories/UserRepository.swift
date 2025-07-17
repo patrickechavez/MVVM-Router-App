@@ -8,17 +8,14 @@
 import Foundation
 
 protocol UserRepositoryProtocol {
-    func getUsers() async throws -> [User]
+    func fetchUsers(filter: UserFilter?) async throws -> [User]
 }
 
 class UserRepository: UserRepositoryProtocol {
-    private let apiService: APIService
+    private let networkService: NetworkService
+    init(networkService: NetworkService = NetworkService()) { self.networkService = networkService }
 
-    init(apiService: APIService = APIService()) {
-        self.apiService = apiService
-    }
-
-    func getUsers() async throws -> [User] {
-        return try await apiService.request(endpoint: APIEndpoint.getUsers)
+    func fetchUsers(filter: UserFilter?) async throws -> [User] {
+        try await networkService.request(endpoint: APIEndpoint.getUsers(filters: filter))
     }
 }

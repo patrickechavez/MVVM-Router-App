@@ -31,8 +31,8 @@ class DashboardViewModel: ObservableObject {
     }
     
     func fetchAllData() async {
-        async let users = try? self.userRepository.getUsers()
-        async let products = try? self.productRepository.getProducts()
+        async let users = try? self.userRepository.fetchUsers(filter: nil)
+        async let products = try? self.productRepository.fetchProducts(filter: nil)
         self.users = await users ?? []
         self.products = await products ?? []
     }

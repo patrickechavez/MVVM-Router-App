@@ -8,33 +8,29 @@
 import Foundation
 
 protocol ProductRepositoryProtocol {
-    func getProducts() async throws -> [Product]
-    func createProduct(title: String) async throws -> Product
-    func updateProduct(id: String, title: String) async throws -> Product
-    func deleteProduct(id: String) async throws
+    func fetchProducts(filter: ProductFilter?) async throws -> [Product]
+    func createProduct(_ request: ProductRequest) async throws -> Product
+    func updateProduct(id: Int, _ request: ProductRequest) async throws -> Product
+    func deleteProduct(id: Int) async throws
 }
 
 class ProductRepository: ProductRepositoryProtocol {
+    private let networkService: NetworkService
     
-    private let apiService: APIService
+    init(networkService: NetworkService = NetworkService()) {
+        self.networkService = networkService
+    }
 
-    init(apiService: APIService = APIService()) {
-        self.apiService = apiService
+    func fetchProducts(filter: ProductFilter?) async throws -> [Product] {
+        try await networkService.request(endpoint: APIEndpoint.getProducts(filters: filter))
     }
-    
-    func getProducts() async throws -> [Product] {
-        return try await apiService.request(endpoint: APIEndpoint.getProducts)
+    func createProduct(_ request: ProductRequest) async throws -> Product {
+        try await networkService.request(endpoint: APIEndpoint.createProduct(product: request))
     }
-    
-    func createProduct(title: String) async throws -> Product {
-        return try await apiService.request(endpoint: APIEndpoint.createProduct(title: title))
+    func updateProduct(id: Int, _ request: ProductRequest) async throws -> Product {
+        try await networkService.request(endpoint: APIEndpoint.updateProduct(id: id, product: request))
     }
-    
-    func updateProduct(id: String, title: String) async throws -> Product {
-        return try await apiService.request(endpoint: APIEndpoint.updateProduct(id: id, title: title))
-    }
-    
-    func deleteProduct(id: String) async throws {
-        _ = try await apiService.request(endpoint: APIEndpoint.deleteProduct(id: id), responseType: EmptyResponse.self)
+    func deleteProduct(id: Int) async throws {
+        try await networkService.request(endpoint: APIEndpoint.deleteProduct(id: id))
     }
 }
