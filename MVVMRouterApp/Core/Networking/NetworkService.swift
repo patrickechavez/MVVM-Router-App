@@ -95,7 +95,7 @@ class NetworkService {
         
         switch httpResponse.statusCode {
         case 200...299:
-            break // Success
+            break
         case 401:
             throw APIError.unauthorized
         case 404:
